@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import axios from 'axios';
 
 const NOCODB_API_URL = 'https://app.nocodb.com';
