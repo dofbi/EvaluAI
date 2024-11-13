@@ -25,15 +25,16 @@ export async function getAllQuestions(page = 1, limit = 25, langue?: string) {
     console.log(`Fetching questions page ${page} with limit ${limit}${langue ? ` for language: ${langue}` : ''}...`);
     const offset = (page - 1) * limit;
     
-    // Build the where condition for language filtering using NocoDB's simple filter syntax
     const where = langue ? `langue,eq,${langue}` : undefined;
-
-    const response = await nocoClient.get(`/api/v2/tables/${TABLES.QUESTIONS}/records`, {
+    
+    console.log('Request params:', { limit, offset, sort: '-CreatedAt', where });
+    const response = await nocoClient.get(`/api/v2/tables/${TABLES.QUESTIONS}/records`, { 
       params: {
         limit,
         offset,
+        sort: '-CreatedAt',
         where
-      },
+      }
     });
     
     if (!response.data) {
@@ -50,7 +51,11 @@ export async function getAllQuestions(page = 1, limit = 25, langue?: string) {
       }
     };
   } catch (error: any) {
-    console.error('Error fetching questions:', error.response?.data || error.message);
+    console.error('Error fetching questions:', {
+      message: error.message,
+      response: error.response?.data,
+      config: error.config
+    });
     throw error;
   }
 }
@@ -73,7 +78,6 @@ export async function getAnswersByQuestionId(questionId: string | number) {
   try {
     console.log(`Fetching answers for question ${questionId} using linked records API...`);
     
-    // Use the provided linkFieldId for the Réponses relationship
     const response = await nocoClient.get(
       `/api/v2/tables/${TABLES.QUESTIONS}/links/c1s63syhm6ssx8z/records/${questionId}`,
       {
@@ -137,7 +141,6 @@ export async function createNote(note: {
       evaluateur: note.evaluateur
     });
     
-    // Step 1: Create the note without any link field
     const noteResponse = await nocoClient.post(
       `/api/v2/tables/${TABLES.NOTES}/records`,
       {
