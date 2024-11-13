@@ -23,8 +23,8 @@ export function QuestionDetail() {
         </Button>
       </Link>
 
-      <Card>
-        <CardHeader>
+      <Card className="relative">
+        <CardHeader className="sticky top-0 z-10 bg-card shadow-md">
           <CardTitle>{data.question.Question}</CardTitle>
           <div className="text-sm text-muted-foreground">
             Langue: {data.question.langue}
