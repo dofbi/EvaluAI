@@ -41,9 +41,6 @@ export async function getAllQuestions(page = 1, limit = 25, langue?: string) {
     if (!response.data) {
       throw new Error('Failed to fetch questions list');
     }
-
-    console.log('API Response:', response.data);
-    console.log('Filtered questions:', response.data.list);
     
     return {
       list: response.data.list || [],
