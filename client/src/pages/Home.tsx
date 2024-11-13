@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { QuestionList } from "@/components/QuestionList";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -8,12 +8,19 @@ import useSWR from "swr";
 export function Home() {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedLanguage, setSelectedLanguage] = useState<string>("all");
+  const [availableLanguages, setAvailableLanguages] = useState<string[]>([]);
   
   const { data, error } = useSWR(`/api/questions?page=${currentPage}&limit=25&langue=${selectedLanguage}`);
 
-  // Get unique languages from questions for the dropdown
-  const languages = Array.from(new Set((data?.list || []).map((q: any) => q.langue)))
-    .filter(lang => lang); // Filter out any undefined or empty values
+  useEffect(() => {
+    if (data?.list) {
+      const newLanguages = Array.from(new Set(data.list.map((q: any) => q.langue))).filter(lang => lang);
+      setAvailableLanguages(prev => {
+        const combined = Array.from(new Set([...prev, ...newLanguages]));
+        return combined.filter(Boolean);
+      });
+    }
+  }, [data?.list]);
 
   // Reset to page 1 when language changes
   const handleLanguageChange = (newLanguage: string) => {
@@ -42,7 +49,7 @@ export function Home() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Toutes les langues</SelectItem>
-                {languages.map((lang) => (
+                {availableLanguages.map((lang) => (
                   <SelectItem key={lang} value={lang}>
                     {lang}
                   </SelectItem>
