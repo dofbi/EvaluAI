@@ -20,14 +20,30 @@ const TABLES = {
   NOTES: 'm414xsine0wgjc6',
 };
 
-export async function getAllQuestions() {
+export async function getAllQuestions(page = 1, limit = 25) {
   try {
-    console.log('Fetching all questions...');
-    const response = await nocoClient.get(`/api/v2/tables/${TABLES.QUESTIONS}/records`);
-    if (!response.data?.list) {
+    console.log(`Fetching questions page ${page} with limit ${limit}...`);
+    const offset = (page - 1) * limit;
+    const response = await nocoClient.get(`/api/v2/tables/${TABLES.QUESTIONS}/records`, {
+      params: {
+        limit,
+        offset,
+      },
+    });
+    
+    if (!response.data) {
       throw new Error('Failed to fetch questions list');
     }
-    return response.data.list;
+    
+    return {
+      list: response.data.list || [],
+      pageInfo: {
+        totalRows: response.data.pageInfo?.totalRows || 0,
+        page,
+        limit,
+        totalPages: Math.ceil((response.data.pageInfo?.totalRows || 0) / limit)
+      }
+    };
   } catch (error: any) {
     console.error('Error fetching questions:', error.response?.data || error.message);
     throw error;

@@ -18,13 +18,16 @@ export function registerRoutes(app: Express) {
     next();
   });
 
-  // Get all questions
+  // Get all questions with pagination
   app.get("/api/questions", async (req, res) => {
     try {
-      console.log("Fetching all questions from NocoDB...");
-      const allQuestions = await getAllQuestions();
-      console.log(`Successfully fetched ${allQuestions.length} questions`);
-      res.json(allQuestions);
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 25;
+      
+      console.log(`Fetching questions page ${page} with limit ${limit} from NocoDB...`);
+      const result = await getAllQuestions(page, limit);
+      console.log(`Successfully fetched ${result.list.length} questions. Total: ${result.pageInfo.totalRows}`);
+      res.json(result);
     } catch (error: any) {
       console.error("Error details:", {
         message: error.message,
