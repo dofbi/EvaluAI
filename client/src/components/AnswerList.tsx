@@ -92,7 +92,7 @@ export function AnswerList({ answers }: AnswerListProps) {
               </Button>
               {selectedAnswerId === answer.Id && answerDetails?.notes && (
                 <div className="mt-4 space-y-4">
-                  <h4 className="font-semibold">Évaluations individuelles</h4>
+                  <h4 className="font-semibold">Évaluations</h4>
                   {answerDetails.notes.map((note: Note) => (
                     <div key={note.Id} className="border-b py-2">
                       <div className="flex items-center justify-between mb-2">
