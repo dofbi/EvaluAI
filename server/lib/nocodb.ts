@@ -25,7 +25,7 @@ export async function getAllQuestions(page = 1, limit = 25, langue?: string) {
     console.log(`Fetching questions page ${page} with limit ${limit}${langue ? ` for language: ${langue}` : ''}...`);
     const offset = (page - 1) * limit;
     
-    const where = langue ? encodeURIComponent(`(langue,eq,${encodeURIComponent(langue)})`) : undefined;
+    const where = langue ? `(langue,eq,${langue})` : undefined;
     console.log('Where clause:', where);
     
     console.log('Request params:', { limit, offset, sort: 'CreatedAt', where });
@@ -41,6 +41,9 @@ export async function getAllQuestions(page = 1, limit = 25, langue?: string) {
     if (!response.data) {
       throw new Error('Failed to fetch questions list');
     }
+
+    console.log('API Response:', response.data);
+    console.log('Filtered questions:', response.data.list);
     
     return {
       list: response.data.list || [],
@@ -55,7 +58,8 @@ export async function getAllQuestions(page = 1, limit = 25, langue?: string) {
     console.error('Error fetching questions:', {
       message: error.message,
       response: error.response?.data,
-      config: error.config
+      config: error.config,
+      where: where
     });
     throw error;
   }
