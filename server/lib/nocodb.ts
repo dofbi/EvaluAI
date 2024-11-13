@@ -25,9 +25,8 @@ export async function getAllQuestions(page = 1, limit = 25, langue?: string) {
     console.log(`Fetching questions page ${page} with limit ${limit}${langue ? ` for language: ${langue}` : ''}...`);
     const offset = (page - 1) * limit;
     
-    // Build the where condition for language filtering using NocoDB's filter syntax
-    const where = langue ? 
-      encodeURIComponent(`(langue,eq,${langue})`) : undefined;
+    // Build the where condition for language filtering using NocoDB's simple filter syntax
+    const where = langue ? `langue,eq,${langue}` : undefined;
 
     const response = await nocoClient.get(`/api/v2/tables/${TABLES.QUESTIONS}/records`, {
       params: {
