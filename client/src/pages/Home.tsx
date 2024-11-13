@@ -9,20 +9,22 @@ export function Home() {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedLanguage, setSelectedLanguage] = useState<string>("all");
   
-  const { data, error } = useSWR(`/api/questions?page=${currentPage}&limit=25`);
+  const { data, error } = useSWR(`/api/questions?page=${currentPage}&limit=25&langue=${selectedLanguage}`);
 
   if (error) return <div>Impossible de charger les questions</div>;
   if (!data) return <div>Chargement...</div>;
 
   const { list: questions, pageInfo } = data;
 
-  // Get unique languages from questions
-  const languages = Array.from(new Set(questions.map((q: any) => q.langue)));
+  // Get unique languages from questions for the dropdown
+  const languages = Array.from(new Set(questions.map((q: any) => q.langue)))
+    .filter(lang => lang); // Filter out any undefined or empty values
 
-  // Filter questions based on selected language
-  const filteredQuestions = selectedLanguage === "all" 
-    ? questions 
-    : questions.filter((q: any) => q.langue === selectedLanguage);
+  // Reset to page 1 when language changes
+  const handleLanguageChange = (newLanguage: string) => {
+    setSelectedLanguage(newLanguage);
+    setCurrentPage(1);
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -35,7 +37,7 @@ export function Home() {
           <div className="mt-4">
             <Select
               value={selectedLanguage}
-              onValueChange={setSelectedLanguage}
+              onValueChange={handleLanguageChange}
             >
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Sélectionner une langue" />
@@ -53,7 +55,7 @@ export function Home() {
         </CardHeader>
       </Card>
       
-      <QuestionList questions={filteredQuestions} />
+      <QuestionList questions={questions} />
       
       {/* Pagination Controls */}
       <div className="mt-8 flex justify-center gap-2">

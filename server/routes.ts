@@ -18,14 +18,15 @@ export function registerRoutes(app: Express) {
     next();
   });
 
-  // Get all questions with pagination
+  // Get all questions with pagination and language filter
   app.get("/api/questions", async (req, res) => {
     try {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 25;
+      const langue = req.query.langue as string;
       
-      console.log(`Fetching questions page ${page} with limit ${limit} from NocoDB...`);
-      const result = await getAllQuestions(page, limit);
+      console.log(`Fetching questions page ${page} with limit ${limit}${langue ? ` for language: ${langue}` : ''} from NocoDB...`);
+      const result = await getAllQuestions(page, limit, langue !== 'all' ? langue : undefined);
       console.log(`Successfully fetched ${result.list.length} questions. Total: ${result.pageInfo.totalRows}`);
       res.json(result);
     } catch (error: any) {

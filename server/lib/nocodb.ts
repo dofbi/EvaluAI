@@ -20,14 +20,24 @@ const TABLES = {
   NOTES: 'm414xsine0wgjc6',
 };
 
-export async function getAllQuestions(page = 1, limit = 25) {
+export async function getAllQuestions(page = 1, limit = 25, langue?: string) {
   try {
-    console.log(`Fetching questions page ${page} with limit ${limit}...`);
+    console.log(`Fetching questions page ${page} with limit ${limit}${langue ? ` for language: ${langue}` : ''}...`);
     const offset = (page - 1) * limit;
+    
+    // Build the where condition for language filtering
+    const where = langue ? 
+      encodeURIComponent(JSON.stringify({
+        langue: {
+          eq: langue
+        }
+      })) : undefined;
+
     const response = await nocoClient.get(`/api/v2/tables/${TABLES.QUESTIONS}/records`, {
       params: {
         limit,
         offset,
+        where
       },
     });
     
