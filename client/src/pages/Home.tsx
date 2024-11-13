@@ -8,8 +8,8 @@ export function Home() {
   const { data: questions, error } = useSWR("/api/questions");
   const [selectedLanguage, setSelectedLanguage] = useState<string>("all");
 
-  if (error) return <div>Failed to load questions</div>;
-  if (!questions) return <div>Loading...</div>;
+  if (error) return <div>Impossible de charger les questions</div>;
+  if (!questions) return <div>Chargement...</div>;
 
   // Get unique languages from questions
   const languages = Array.from(new Set(questions.map((q: any) => q.langue)));
@@ -23,7 +23,7 @@ export function Home() {
     <div className="container mx-auto px-4 py-8">
       <Card className="mb-8">
         <CardHeader>
-          <CardTitle>Système de Gestion Q&R</CardTitle>
+          <CardTitle>Q&R IA - élections législatives au Sénégal</CardTitle>
           <CardDescription>
             Parcourir les questions et réponses, fournir des évaluations et des commentaires
           </CardDescription>

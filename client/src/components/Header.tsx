@@ -7,7 +7,7 @@ export function Header() {
       <Container>
         <div className="flex items-center gap-2">
           <MessageSquare className="h-6 w-6 text-primary" />
-          <span className="font-semibold text-lg">Q&A Management System</span>
+          <a href="/" className="font-semibold text-lg">AfricTivistes Q&A IA content Management System</a>
         </div>
       </Container>
     </header>

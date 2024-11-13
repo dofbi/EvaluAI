@@ -11,8 +11,8 @@ export function QuestionDetail() {
   const { id } = useParams();
   const { data, error } = useSWR<QuestionWithAnswers>(`/api/questions/${id}`);
 
-  if (error) return <div>Failed to load question</div>;
-  if (!data) return <div>Loading...</div>;
+  if (error) return <div>Impossible de charger la question</div>;
+  if (!data) return <div>Chargement...</div>;
 
   return (
     <div className="container mx-auto px-4 py-8">
