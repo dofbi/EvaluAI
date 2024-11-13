@@ -25,13 +25,9 @@ export async function getAllQuestions(page = 1, limit = 25, langue?: string) {
     console.log(`Fetching questions page ${page} with limit ${limit}${langue ? ` for language: ${langue}` : ''}...`);
     const offset = (page - 1) * limit;
     
-    // Build the where condition for language filtering
+    // Build the where condition for language filtering using NocoDB's filter syntax
     const where = langue ? 
-      encodeURIComponent(JSON.stringify({
-        langue: {
-          eq: langue
-        }
-      })) : undefined;
+      encodeURIComponent(`(langue,eq,${langue})`) : undefined;
 
     const response = await nocoClient.get(`/api/v2/tables/${TABLES.QUESTIONS}/records`, {
       params: {
@@ -164,7 +160,6 @@ export async function createNote(note: {
   }
 }
 
-// Add a new function to create the link between note and answer
 export async function linkNoteToAnswer(noteId: number, answerId: number) {
   try {
     console.log('Creating link between note and answer...');
