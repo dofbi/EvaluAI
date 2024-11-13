@@ -11,13 +11,8 @@ export function Home() {
   
   const { data, error } = useSWR(`/api/questions?page=${currentPage}&limit=25&langue=${selectedLanguage}`);
 
-  if (error) return <div>Impossible de charger les questions</div>;
-  if (!data) return <div>Chargement...</div>;
-
-  const { list: questions, pageInfo } = data;
-
   // Get unique languages from questions for the dropdown
-  const languages = Array.from(new Set(questions.map((q: any) => q.langue)))
+  const languages = Array.from(new Set((data?.list || []).map((q: any) => q.langue)))
     .filter(lang => lang); // Filter out any undefined or empty values
 
   // Reset to page 1 when language changes
@@ -26,9 +21,12 @@ export function Home() {
     setCurrentPage(1);
   };
 
+  const questions = data?.list || [];
+  const pageInfo = data?.pageInfo || { totalPages: 1 };
+
   return (
     <div className="container mx-auto px-4 py-8">
-      <Card className="mb-8">
+      <Card className="mb-8 sticky top-0 bg-white z-10">
         <CardHeader>
           <CardTitle>Q&R IA - élections législatives au Sénégal</CardTitle>
           <CardDescription>
@@ -54,29 +52,35 @@ export function Home() {
           </div>
         </CardHeader>
       </Card>
-      
-      <QuestionList questions={questions} />
-      
-      {/* Pagination Controls */}
-      <div className="mt-8 flex justify-center gap-2">
-        <Button
-          variant="outline"
-          onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-          disabled={currentPage === 1}
-        >
-          Page précédente
-        </Button>
-        <span className="py-2 px-4 text-sm">
-          Page {currentPage} sur {pageInfo.totalPages}
-        </span>
-        <Button
-          variant="outline"
-          onClick={() => setCurrentPage(p => Math.min(pageInfo.totalPages, p + 1))}
-          disabled={currentPage === pageInfo.totalPages}
-        >
-          Page suivante
-        </Button>
-      </div>
+
+      {error ? (
+        <div>Impossible de charger les questions</div>
+      ) : !data ? (
+        <div>Chargement...</div>
+      ) : (
+        <>
+          <QuestionList questions={questions} />
+          <div className="mt-8 flex justify-center gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+            >
+              Page précédente
+            </Button>
+            <span className="py-2 px-4 text-sm">
+              Page {currentPage} sur {pageInfo.totalPages}
+            </span>
+            <Button
+              variant="outline"
+              onClick={() => setCurrentPage(p => Math.min(pageInfo.totalPages, p + 1))}
+              disabled={currentPage === pageInfo.totalPages}
+            >
+              Page suivante
+            </Button>
+          </div>
+        </>
+      )}
     </div>
   );
 }
