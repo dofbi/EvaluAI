@@ -9,18 +9,31 @@ export function Home() {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedLanguage, setSelectedLanguage] = useState<string>("all");
   const [availableLanguages, setAvailableLanguages] = useState<string[]>([]);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
   
   const { data, error } = useSWR(`/api/questions?page=${currentPage}&limit=25&langue=${selectedLanguage}`);
 
+  // Initial load of languages
   useEffect(() => {
-    if (data?.list) {
-      const newLanguages = Array.from(new Set(data.list.map((q: any) => q.langue))).filter(lang => lang);
-      setAvailableLanguages(prev => {
-        const combined = Array.from(new Set([...prev, ...newLanguages]));
-        return combined.filter(Boolean);
-      });
+    if (isInitialLoad) {
+      fetch('/api/questions?page=1&limit=100')
+        .then(res => res.json())
+        .then(data => {
+          const languages = Array.from(new Set(data.list.map((q: any) => q.langue))).filter(Boolean);
+          setAvailableLanguages(languages);
+          setIsInitialLoad(false);
+        })
+        .catch(console.error);
     }
-  }, [data?.list]);
+  }, [isInitialLoad]);
+
+  // Update pagination info when data changes
+  useEffect(() => {
+    if (!isInitialLoad && data?.list) {
+      // Only update pagination info, not languages
+      const totalPages = data.pageInfo?.totalPages || 1;
+    }
+  }, [data?.list, isInitialLoad]);
 
   // Reset to page 1 when language changes
   const handleLanguageChange = (newLanguage: string) => {
